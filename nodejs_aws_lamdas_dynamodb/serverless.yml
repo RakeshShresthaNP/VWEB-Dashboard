@@ -1,0 +1,141 @@
+service: serverless-document-management-api
+
+plugins:
+  - serverless-esbuild
+  - serverless-dynamodb-local
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  stage: dev
+  region: eu-west-1
+  apiGateway:
+    minimumCompressionSize: 1024
+    shouldStartNameWithService: true
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    DOCUMENT_TABLE: document_table
+    USER_TABLE: user_table
+
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:PutItem"
+            - "dynamodb:GetItem"
+            - "dynamodb:Query"
+            - "dynamodb:Scan"
+          Resource:
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONTRACT_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USER_TABLE}
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    # set output file extention to .cjs so that we can use it as ES modules
+    outputFileExtension: ".cjs"
+    exclude:
+      - aws-sdk
+    target: node14
+    platform: node
+    concurrency: 10
+
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 5000
+      inMemory: true
+      migrate: true
+
+functions:
+  verifyToken:
+    handler: src/actions/index.verifyToken
+  signUp:
+    handler: src/actions/index.signUp
+    events:
+      - http:
+          path: signup
+          method: post
+          cors: true
+
+  logIn:
+    handler: src/actions/index.logIn
+    events:
+      - http:
+          path: login
+          method: post
+          cors: true
+
+  getDocumentsIds:
+    handler: src/actions/index.getDocumentsIds
+    events:
+      - http:
+          method: get
+          path: documents
+          cors: true
+          authorizer:
+            name: verifyToken
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 3600
+
+  createDocument:
+    handler: src/actions/index.createDocument
+    events:
+      - http:
+          path: documents/create
+          method: post
+          cors: true
+          authorizer:
+            name: verifyToken
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 3600
+
+  getDocument:
+    handler: src/actions/index.getDocument
+    events:
+      - http:
+          path: documents/{id}
+          method: get
+          cors: true
+          authorizer:
+            name: verifyToken
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 3600
+
+resources:
+  Resources:
+    documentTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DOCUMENT_TABLE}
+        BillingMode: PAY_PER_REQUEST
+
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.USER_TABLE}
+        BillingMode: PAY_PER_REQUEST

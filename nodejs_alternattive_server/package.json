@@ -1,0 +1,46 @@
+{
+  "name": "nodeapiserver",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "license": "MIT",
+  "author": "",
+  "scripts": {
+    "build": "nitro build",
+    "start": "nitro dev"
+  },
+  "dependencies": {
+    "@faker-js/faker": "catalog:",
+    "jsonwebtoken": "catalog:",
+    "cross-env": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:",
+    "dotenv": "^16.0.3",
+    "unbuild": "catalog:",
+    "nitropack": "catalog:"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "catalog:",
+    "h3": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "eslint": "*"
+      }
+    },
+    "overrides": {
+      "esbuild": "0.25.3"
+    },
+    "neverBuiltDependencies": [
+      "canvas",
+      "node-gyp"
+    ]
+  }
+
+}

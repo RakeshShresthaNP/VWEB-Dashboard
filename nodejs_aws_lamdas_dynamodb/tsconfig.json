@@ -1,0 +1,31 @@
+{
+  "extends": "./tsconfig.paths.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "target": "ES2022",
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*.ts", "serverless.yml"],
+  "exclude": [
+    "node_modules",
+    ".serverless/**/*",
+    ".dynamodb/**/*",
+    ".esbuild/**/*",
+    ".vscode/**/*",
+    "test/**/*.test.ts"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}
