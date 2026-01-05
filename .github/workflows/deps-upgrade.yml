@@ -1,0 +1,69 @@
+name: deps-upgrade-nodejs-aws-lambdas-dynamodb
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - update/aws-lambdas-dynamodb/deps-upgrade
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: update/aws-lambdas-dynamodb/deps-upgrade
+
+      - name: Setup Node (v22) and enable Corepack
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Enable corepack and activate pnpm 10.22.0
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.22.0 --activate
+          pnpm -v
+
+      - name: Install & upgrade deps to latest (allow majors)
+        working-directory: nodejs_aws_lamdas_dynamodb
+        run: |
+          pnpm install --frozen-lockfile=false
+          pnpm up -L --latest
+
+      - name: Show changed files
+        run: |
+          git --no-pager status --porcelain
+          git --no-pager diff --name-only || true
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add nodejs_aws_lamdas_dynamodb/package.json nodejs_aws_lamdas_dynamodb/pnpm-lock.yaml || true
+          git commit -m "chore(deps): upgrade nodejs_aws_lamdas_dynamodb dependencies to latest" || echo "No changes to commit"
+
+      - name: Push branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin HEAD:refs/heads/update/aws-lambdas-dynamodb/deps-upgrade --force
+
+      - name: Create or update Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update/aws-lambdas-dynamodb/deps-upgrade
+          base: main
+          title: "chore(deps): upgrade nodejs_aws_lamdas_dynamodb dependencies to latest"
+          body: |
+            Automated dependency upgrade for nodejs_aws_lamdas_dynamodb (major upgrades allowed).
+            - Performed with: pnpm up -L --latest
+            - Updated files: package.json, pnpm-lock.yaml (if changed)
+            - No tests executed (as requested).
+          labels: dependencies, automated
