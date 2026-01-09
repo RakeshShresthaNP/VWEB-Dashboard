@@ -1,7 +1,5 @@
 Enterprise grade Vue.js 3 Dashboard suitable for CRM, MIS, ERP, Data Analytics, Business Intelligence and various other enterprise applications
 
-AI is based on google ai
-
 Some Components
 
 The Conversational AI component is a feature that serves as a (UI) element. 
