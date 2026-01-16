@@ -1,8 +1,8 @@
-import HTTPError from "src/utils/error";
+import HTTPError from "../utils/error";
 import { DataMapper } from "@aws/dynamodb-data-mapper";
 import { ConditionExpressionPredicate } from "@aws/dynamodb-expressions";
-import { errorDomain } from "src/utils/error-domain";
-import { User } from "src/model/user-model";
+import { errorDomain } from "../utils/error-domain";
+import { User } from "../model/user-model";
 import JWTService from "./jwt-service";
 
 export interface CreateUserInput {
@@ -29,7 +29,7 @@ export class UserService {
    * @param {CreateUserInput} input
    * @returns user
    */
-  async signUp(input: CreateUserInput): Promise<any> {
+  async signUp(input: CreateUserInput): Promise<{ user: User }> {
     try {
       // Check emptyness of the incoming data
       if (!input?.username || !input?.email || !input?.password) {
@@ -82,11 +82,11 @@ export class UserService {
    * @param {string} email
    * @returns user
    */
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<User> {
     email = email.trim().toLowerCase();
     const params: User = Object.assign(new User(), { email: email });
     const user = await this.mapper.get(params);
-    return user;
+    return user as User;
   }
 
   /**
@@ -94,30 +94,33 @@ export class UserService {
    * @param {LoginInput} input
    * @returns user, access_token
    */
-  async login(input: LoginInput): Promise<any> {
+  async login(input: LoginInput): Promise<{ user: User; access_token: string }> {
     const errorMsg = "Invalid email or password";
 
-    // Get our user by email
-    const user: User = await this.getUserByEmail(input.email);
+    try {
+      // Get our user by email
+      const user: User = await this.getUserByEmail(input.email);
 
-    // if there is no user, throw an authentication error
-    if (!user) {
+      // validate the password
+      const passwordIsValid = await user.comparePassword(input.password);
+      if (!passwordIsValid) {
+        throw new HTTPError(401, errorMsg, errorDomain.FORBIDDEN);
+      }
+
+      // sign a jwt
+      const access_token = this.authService.signJwtToken(user);
+
+      // return token
+      return {
+        user: user,
+        access_token: access_token,
+      };
+    } catch (error) {
+      // If user not found or any other error, throw authentication error
+      if (error instanceof HTTPError) {
+        throw error;
+      }
       throw new HTTPError(401, errorMsg, errorDomain.FORBIDDEN);
     }
-
-    // validate the password
-    const passwordIsValid = await user.comparePassword(input.password);
-    if (!passwordIsValid) {
-      throw new HTTPError(401, errorMsg, errorDomain.FORBIDDEN);
-    }
-
-    // sign a jwt
-    const access_token = this.authService.signJwtToken(user);
-
-    // return token
-    return {
-      user: user,
-      access_token: access_token,
-    };
   }
 }

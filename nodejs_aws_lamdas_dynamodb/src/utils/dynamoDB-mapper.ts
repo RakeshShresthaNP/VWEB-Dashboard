@@ -1,6 +1,7 @@
 import { DataMapper } from "@aws/dynamodb-data-mapper";
 import DynamoDB from "aws-sdk/clients/dynamodb";
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 const dynamoDBOfflineOptions: DynamoDB.ClientConfiguration = {

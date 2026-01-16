@@ -1,4 +1,4 @@
-import { errorDomain } from "src/utils/error-domain";
+import { errorDomain } from "./error-domain";
 
 export default class HTTPError extends Error {
   statusCode?: number;

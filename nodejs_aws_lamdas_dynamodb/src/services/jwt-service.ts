@@ -7,14 +7,17 @@ export default class JWTService {
   private readonly publicKey: string;
 
   constructor() {
-    this.privateKey = Buffer.from(
-      process.env.JWT_ACCESS_PRIVATE_KEY,
-      "base64"
-    ).toString("ascii");
-    this.publicKey = Buffer.from(
-      process.env.JWT_ACCESS_PUBLIC_KEY,
-      "base64"
-    ).toString("ascii");
+    const privateKeyEnv = process.env.JWT_ACCESS_PRIVATE_KEY;
+    const publicKeyEnv = process.env.JWT_ACCESS_PUBLIC_KEY;
+
+    if (!privateKeyEnv || !publicKeyEnv) {
+      throw new Error(
+        "JWT_ACCESS_PRIVATE_KEY and JWT_ACCESS_PUBLIC_KEY must be set in environment variables"
+      );
+    }
+
+    this.privateKey = Buffer.from(privateKeyEnv, "base64").toString("ascii");
+    this.publicKey = Buffer.from(publicKeyEnv, "base64").toString("ascii");
   }
 
   /**

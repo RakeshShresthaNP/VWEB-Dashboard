@@ -1,6 +1,6 @@
 import { DataMapper } from "@aws/dynamodb-data-mapper";
-import { errorDomain } from "src/utils/error-domain";
-import HTTPError from "src/utils/error";
+import { errorDomain } from "../utils/error-domain";
+import HTTPError from "../utils/error";
 
 import { Document } from "../model/document-model";
 
