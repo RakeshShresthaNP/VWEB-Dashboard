@@ -41,7 +41,7 @@ custom:
     outputFileExtension: ".cjs"
     exclude:
       - aws-sdk
-    target: node14
+    target: node22
     platform: node
     concurrency: 10
 

@@ -10,18 +10,16 @@
     "start": "nitro dev"
   },
   "dependencies": {
-    "@faker-js/faker": "catalog:",
-    "jsonwebtoken": "catalog:",
-    "cross-env": "catalog:",
-    "turbo": "catalog:",
-    "typescript": "catalog:",
-    "dotenv": "^16.0.3",
-    "unbuild": "catalog:",
-    "nitropack": "catalog:"
+    "@faker-js/faker": "^10.2.0",
+    "dotenv": "^17.2.3",
+    "h3": "^1.15.5",
+    "jsonwebtoken": "^9.0.3",
+    "nitropack": "^2.13.1"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "catalog:",
-    "h3": "catalog:"
+    "@types/jsonwebtoken": "^9.0.10",
+    "typescript": "^5.9.3",
+    "unbuild": "^3.6.1"
   },
   "engines": {
     "node": ">=22.0.0",
