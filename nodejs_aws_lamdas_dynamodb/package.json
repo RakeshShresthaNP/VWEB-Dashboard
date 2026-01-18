@@ -35,7 +35,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/chai": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.2",
-    "@types/mocha": "^11.0.1",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^25.0.9",
     "aws-sdk": "^2.1303.0",
     "chai": "^5.1.2",
@@ -50,7 +50,7 @@
     "tsconfig-paths": "^3.9.0",
     "typescript": "^5.9.3"
   },
-  "packageManager": "pnpm@10.22.0",
+  "packageManager": "pnpm@10.28.0",
   "pnpm": {
     "peerDependencyRules": {
       "allowedVersions": {
@@ -65,5 +65,4 @@
       "node-gyp"
     ]
   }
-
 }
